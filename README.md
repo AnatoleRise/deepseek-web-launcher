@@ -49,11 +49,7 @@ npm install -g @deepseek-ai/dsh
 
 ## 安装
 
-建议从 GitHub Releases 页面下载：
-
-```text
-DeepSeek-Web-1.1.0-macOS26-arm64.dmg
-```
+请前往 [GitHub Releases 最新版本页面](https://github.com/AnatoleRise/deepseek-web-launcher/releases/latest) 下载适用于当前系统的安装包及 SHA-256 校验文件。
 
 打开 DMG，将 `DeepSeek Web.app` 拖入 `Applications` 文件夹。
 
@@ -70,7 +66,7 @@ open "/Applications/DeepSeek Web.app"
 
 该命令只移除 DeepSeek Web 的下载隔离标记，不会关闭系统 Gatekeeper。不要对来源不明的应用执行此操作。
 
-更完整的步骤请参阅[安装说明](./安装说明.txt)。
+更完整的步骤请参阅[安装说明](./Docs/安装说明.txt)。
 
 ## 首次启动
 
@@ -113,8 +109,8 @@ Node.js 与 npm 通过检测后，用户可以：
 执行：
 
 ```bash
-chmod +x build_dmg.sh
-./build_dmg.sh
+chmod +x Scripts/build_dmg.sh
+./Scripts/build_dmg.sh
 ```
 
 构建脚本会先运行隔离环境检测测试，再生成：
@@ -130,12 +126,15 @@ dist/DeepSeek-Web-1.1.0-macOS26-arm64.sha256
 
 ```text
 .
-├── DshWebBar.swift          # 应用、环境检测、安装向导与菜单栏逻辑
-├── RuntimeLocatorTests.swift # 隔离环境检测测试
-├── Info.plist               # macOS 应用配置
-├── build_dmg.sh             # ARM64 DMG 构建脚本
-├── 安装说明.txt              # 面向最终用户的安装教程
-└── AppIcon.icns             # 应用图标
+├── Sources/DeepSeekWeb/     # 应用、环境检测、安装向导与菜单栏逻辑
+├── Tests/                   # 隔离环境检测测试
+├── Resources/               # 应用图标、菜单栏图标与图标集
+├── Config/                  # macOS 应用配置
+├── Scripts/                 # 构建与打包脚本
+├── Docs/                    # 面向最终用户的中文文档
+├── Tools/IconGeneration/    # 图标生成、预览与诊断工具
+├── README.md                # 项目说明
+└── LICENSE                  # MIT License
 ```
 
 ## 安全与隐私说明

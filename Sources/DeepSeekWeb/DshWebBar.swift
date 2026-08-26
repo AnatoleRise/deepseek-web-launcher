@@ -1,6 +1,6 @@
 // DshWebBar.swift
 // DeepSeek Web 菜单栏常驻小应用：一键启动/停止 `dsh web` 服务 + 更新哨兵
-// 构建：swiftc -O -swift-version 5 -parse-as-library -o dsh-web-bar DshWebBar.swift
+// 构建：由项目根目录下的 Scripts/build_dmg.sh 统一完成
 
 import SwiftUI
 import AppKit
