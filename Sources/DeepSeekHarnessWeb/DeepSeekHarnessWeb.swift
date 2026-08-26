@@ -413,6 +413,71 @@ final class HarnessProcessManager: ObservableObject {
         self.runtime = runtime
     }
 
+    /// 启动前预检：清理占用 3080 的遗留 dsh 进程（如旧实例异常退出后的孤儿），
+    /// 避免新服务 EADDRINUSE 秒崩后面板状态翻回「未运行」。
+    /// 只处置 dsh 进程；其他程序占用端口仅记日志，不擅自处置。
+    private func reclaimWebPortIfNeeded() {
+        let port = String(Self.webURL.port ?? 3080)
+        guard let pids = listeningPIDs(onPort: port), !pids.isEmpty else { return }
+        for pid in pids {
+            let command = processCommandLine(of: pid)
+            guard command.contains("dsh") else {
+                appendLog("端口 \(port) 被 PID \(pid)（\(command)）占用，不属于 dsh 进程，跳过清理")
+                continue
+            }
+            appendLog("检测到遗留 dsh 进程占用 \(port)（PID \(pid)），自动清理后接管服务")
+            kill(pid, SIGTERM)
+            var waited: TimeInterval = 0
+            while kill(pid, 0) == 0 && waited < 1.5 {
+                Thread.sleep(forTimeInterval: 0.1)
+                waited += 0.1
+            }
+            if kill(pid, 0) == 0 {
+                kill(pid, SIGKILL)
+            }
+        }
+    }
+
+    /// 查询监听指定 TCP 端口的进程 PID（空数组表示端口空闲）
+    private func listeningPIDs(onPort port: String) -> [Int32]? {
+        let probe = Process()
+        let pipe = Pipe()
+        probe.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof")
+        probe.arguments = ["-nP", "-t", "-iTCP:\(port)", "-sTCP:LISTEN"]
+        probe.standardOutput = pipe
+        probe.standardError = Pipe()
+        do {
+            try probe.run()
+            probe.waitUntilExit()
+        } catch {
+            return nil
+        }
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        return String(data: data, encoding: .utf8)?
+            .split(whereSeparator: \.isWhitespace)
+            .compactMap { Int32($0) }
+            .filter { $0 > 0 } ?? []
+    }
+
+    /// 读取进程完整命令行（用于确认端口占用者是否为 dsh）
+    private func processCommandLine(of pid: Int32) -> String {
+        let ps = Process()
+        let pipe = Pipe()
+        ps.executableURL = URL(fileURLWithPath: "/bin/ps")
+        ps.arguments = ["-o", "command=", "-p", String(pid)]
+        ps.standardOutput = pipe
+        ps.standardError = Pipe()
+        do {
+            try ps.run()
+            ps.waitUntilExit()
+        } catch {
+            return ""
+        }
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        return String(data: data, encoding: .utf8)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    }
+
     /// 启动服务；仅应用首次启动时允许 dsh 自动打开浏览器，其余启动路径保持静默。
     func start(openWebOnLaunch: Bool = false) {
         if state == .running {
@@ -427,6 +492,9 @@ final class HarnessProcessManager: ObservableObject {
             NSSound.beep()
             return
         }
+
+        // 启动前预检：清理遗留 dsh web 进程再接管 3080，避免秒崩导致状态翻回
+        reclaimWebPortIfNeeded()
 
         let p = Process()
         p.executableURL = URL(fileURLWithPath: runtime.dshPath)

@@ -154,7 +154,7 @@ dist/DeepSeek-Harness-Web-1.1.0-macOS26-arm64.sha256
 
 - 安装 Harness 前会显示命令，并由用户主动确认。
 - 不会自动执行 `sudo`，也不会自动修改 shell 配置。
-- 启动器只管理由自身启动的 dsh 子进程。
+- 启动器只管理 dsh 子进程；启动服务前会自动清理占用 3080 端口的遗留 `dsh web` 进程（如旧实例留下的孤儿），不处置其他程序。
 - Harness 本身的联网、模型和数据处理行为不属于本启动器能力范围，请参考 DeepSeek Harness 官方说明。
 
 ## 上游项目
