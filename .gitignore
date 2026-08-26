@@ -1,0 +1,17 @@
+# macOS 本地文件
+.DS_Store
+
+# 本地 Agent 规则文件，禁止提交或上传
+AGENTS.md
+CLAUDE.md
+
+# 本地编译与分发产物
+dsh-web-bar
+dist/
+*.dmg
+*.sha256
+
+# Swift / Xcode 临时产物
+.build/
+DerivedData/
+*.xcuserstate
