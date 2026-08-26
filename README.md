@@ -5,7 +5,7 @@
 它将本地运行的 DeepSeek Harness Web 服务收纳到菜单栏中，提供环境检测、分步安装、服务启停、版本检查和日志查看等能力。界面使用 macOS 原生 SwiftUI 与 Liquid Glass，适合希望通过图形界面使用 `dsh web` 的用户。
 
 > [!IMPORTANT]
-> 本项目是非官方第三方启动器，与 DeepSeek 官方没有隶属或授权关系。DeepSeek Harness 的代码、功能与许可证以其[官方仓库](https://github.com/deepseek-ai/deepseek-harness)为准。
+> 本项目是非官方第三方启动器，与 DeepSeek 官方没有隶属或授权关系。本项目不修改 DeepSeek Harness 的代码，仅围绕官方版本提供 macOS 菜单栏启动与管理能力。DeepSeek Harness 的代码、功能与许可证以其[官方仓库](https://github.com/deepseek-ai/deepseek-harness)为准。
 
 ## 主要功能
 
@@ -21,7 +21,7 @@
 
 ## 工作方式
 
-DeepSeek Web 只是启动器，不会将 Node.js、npm、DeepSeek Harness 或 `node_modules` 打包进应用。
+DeepSeek Web 负责检测并调用用户环境中已有的 Node.js、npm 和 DeepSeek Harness。
 
 应用启动后会依次执行以下检查：
 
@@ -120,7 +120,7 @@ dist/DeepSeek-Web-1.1.0-macOS26-arm64.dmg
 dist/DeepSeek-Web-1.1.0-macOS26-arm64.sha256
 ```
 
-脚本还会检查应用架构、最低系统版本、临时签名，并阻止 Node、npm、dsh 运行时或 `node_modules` 被误打包。
+脚本还会检查应用架构、最低系统版本、临时签名和发行包内容。
 
 ## 项目结构
 
@@ -139,7 +139,6 @@ dist/DeepSeek-Web-1.1.0-macOS26-arm64.sha256
 
 ## 安全与隐私说明
 
-- 启动器不会携带制作者本机的 DeepSeek Harness。
 - 安装 Harness 前会显示命令，并由用户主动确认。
 - 不会自动执行 `sudo`，也不会自动修改 shell 配置。
 - 启动器只管理由自身启动的 dsh 子进程。
