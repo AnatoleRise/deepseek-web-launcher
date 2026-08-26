@@ -1,0 +1,64 @@
+DeepSeek Web 1.1.0 安装说明
+===========================
+
+适用范围
+--------
+- macOS 26 或更高版本
+- Apple Silicon（ARM64）Mac
+- 首次安装 Node.js 或 DeepSeek Harness 时需要网络连接
+
+重要说明
+--------
+DeepSeek Web 只是菜单栏启动器。DMG 中不包含 Node.js、npm、DeepSeek Harness、
+node_modules，也不会复制制作者电脑上的任何 Harness 文件。
+
+一、安装应用
+------------
+1. 打开 DMG。
+2. 将“DeepSeek Web.app”拖入右侧 Applications 文件夹。
+3. 从“应用程序”文件夹启动 DeepSeek Web。
+
+二、免证书测试版的首次打开
+--------------------------
+本测试版没有 Apple Developer ID 签名和公证，Gatekeeper 可能阻止首次打开。
+请先向提供者确认 DMG 的 SHA-256，并在终端中验证下载文件：
+
+shasum -a 256 "/下载路径/DeepSeek-Web-1.1.0-macOS26-arm64.dmg"
+
+只有在确认哈希和文件来源可信后，才执行：
+
+xattr -dr com.apple.quarantine "/Applications/DeepSeek Web.app"
+open "/Applications/DeepSeek Web.app"
+
+以上命令只移除该应用的下载隔离标记，不会关闭系统 Gatekeeper。
+
+三、分步安装向导
+----------------
+应用每次启动都会先检测本机环境，未完成依赖安装时不会启动 3080 服务。
+
+步骤 1：Node.js
+- 需要 Node 22.19+（仅 22.x）或 Node 24+。
+- 可点击“打开 Node.js 官方安装页”自行安装。
+- 若已安装 Homebrew，可选择执行：brew install node@24
+- 启动器不会自动安装 Homebrew，不会自动执行 sudo。
+
+步骤 2：DeepSeek Harness
+- 可由启动器在您确认后执行全局安装：
+
+npm install -g @deepseek-ai/dsh
+
+- 也可以复制该命令，在终端中手动安装后点击“重新检测”。
+- 官方的一次性命令 npx @deepseek-ai/dsh web 仅供临时运行，不是本启动器的安装方式。
+
+步骤 3：启动
+- 检测全部通过后，应用首次启动服务并打开 Web 界面。
+- 菜单栏内停止、再次启动服务不会重复打开浏览器。
+
+四、退出与日志
+--------------
+- 不希望安装依赖时，点击“退出应用”即可，不会启动 DeepSeek Harness。
+- 安装与运行日志位于：~/Library/Logs/dsh-web-bar.log
+- 安装失败时不会自动提升管理员权限，请查看日志或改用手动安装。
+
+官方项目：https://github.com/deepseek-ai/deepseek-harness
+Node.js 下载：https://nodejs.org/en/download
