@@ -62,7 +62,7 @@ npm install -g @deepseek-ai/dsh
 
 ## 安装
 
-请前往 [GitHub Releases 最新版本页面](https://github.com/AnatoleRise/deepseek-web-launcher/releases/latest) 下载适用于当前系统的安装包及 SHA-256 校验文件。
+请前往 [GitHub Releases 最新版本页面](https://github.com/AnatoleRise/deepseek-harness-launcher/releases/latest) 下载适用于当前系统的安装包及 SHA-256 校验文件。
 
 打开 DMG，将 `DeepSeek Web.app` 拖入 `Applications` 文件夹。
 
