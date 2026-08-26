@@ -1,5 +1,5 @@
-// DshWebBar.swift
-// DeepSeek Web 菜单栏常驻小应用：一键启动/停止 `dsh web` 服务 + 更新哨兵
+// DeepSeekHarnessWeb.swift
+// DeepSeek Harness Web 菜单栏常驻小应用：一键启动/停止 `dsh web` 服务 + 更新哨兵
 // 构建：由项目根目录下的 Scripts/build_dmg.sh 统一完成
 
 import SwiftUI
@@ -136,7 +136,7 @@ enum RuntimeLocator {
         let nvmRoot = home + "/.nvm/versions/node"
         if let versions = try? FileManager.default.contentsOfDirectory(atPath: nvmRoot) {
             let sorted = versions.filter { $0.hasPrefix("v") }.sorted {
-                DshProcessManager.compareVersion($0, $1) > 0
+                HarnessProcessManager.compareVersion($0, $1) > 0
             }
             result.append(contentsOf: sorted.map { nvmRoot + "/" + $0 + "/bin" })
         }
@@ -252,7 +252,7 @@ final class BootstrapCoordinator: ObservableObject {
         message = "正在全局安装 DeepSeek Harness…"
         runInstaller(
             executable: nodeEnvironment.npmPath,
-            arguments: ["install", "--global", DshUpdateManager.packageName],
+            arguments: ["install", "--global", HarnessUpdateManager.packageName],
             pathPrefix: nodeEnvironment.binPath,
             fallbackStep: .harness
         )
@@ -281,12 +281,12 @@ final class BootstrapCoordinator: ObservableObject {
             brewPath = runtime.node.brewPath
             step = .ready
             message = "运行环境已就绪。"
-            DshProcessManager.shared.configure(runtime: runtime)
-            DshUpdateManager.shared.startAutomaticChecks()
+            HarnessProcessManager.shared.configure(runtime: runtime)
+            HarnessUpdateManager.shared.startAutomaticChecks()
             SetupWindowController.shared.closeAfterSuccess()
             if !hasLaunchedService {
                 hasLaunchedService = true
-                DshProcessManager.shared.start(openWebOnLaunch: true)
+                HarnessProcessManager.shared.start(openWebOnLaunch: true)
             }
         }
     }
@@ -299,7 +299,7 @@ final class BootstrapCoordinator: ObservableObject {
     ) {
         errorMessage = nil
         installOutput = "$ \(([executable] + arguments).joined(separator: " "))\n"
-        DshProcessManager.shared.appendLog("\n===== 安装向导执行：\(([executable] + arguments).joined(separator: " ")) =====")
+        HarnessProcessManager.shared.appendLog("\n===== 安装向导执行：\(([executable] + arguments).joined(separator: " ")) =====")
 
         let process = Process()
         let pipe = Pipe()
@@ -316,7 +316,7 @@ final class BootstrapCoordinator: ObservableObject {
             let data = handle.availableData
             guard !data.isEmpty, let text = String(data: data, encoding: .utf8) else { return }
             self?.appendInstallerOutput(text)
-            DshProcessManager.shared.appendLog(text.trimmingCharacters(in: .newlines))
+            HarnessProcessManager.shared.appendLog(text.trimmingCharacters(in: .newlines))
         }
 
         process.terminationHandler = { [weak self] finished in
@@ -362,7 +362,7 @@ final class BootstrapCoordinator: ObservableObject {
 
 // MARK: - 进程管理器：探测 dsh 路径、启动/停止进程、维护运行状态
 
-final class DshProcessManager: ObservableObject {
+final class HarnessProcessManager: ObservableObject {
     enum RunState {
         case stopped
         case running
@@ -377,15 +377,15 @@ final class DshProcessManager: ObservableObject {
     static let webURL = URL(string: "http://127.0.0.1:3080")!
 
     /// 单例：菜单 UI 与 AppDelegate 收尾逻辑共享同一份进程状态
-    static let shared = DshProcessManager()
+    static let shared = HarnessProcessManager()
 
     init() {
-        // 日志文件固定放在 ~/Library/Logs/dsh-web-bar.log
+        // 日志文件固定放在 ~/Library/Logs/deepseek-harness-web.log
         let logsDir = FileManager.default
             .urls(for: .libraryDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Logs", isDirectory: true)
         try? FileManager.default.createDirectory(at: logsDir, withIntermediateDirectories: true)
-        logFileURL = logsDir.appendingPathComponent("dsh-web-bar.log")
+        logFileURL = logsDir.appendingPathComponent("deepseek-harness-web.log")
         if !FileManager.default.fileExists(atPath: logFileURL.path) {
             FileManager.default.createFile(atPath: logFileURL.path, contents: nil)
         }
@@ -544,7 +544,7 @@ final class DshProcessManager: ObservableObject {
 
 // MARK: - 更新哨兵：检测 @deepseek-ai/dsh 新版本，一键执行 npm update -g
 
-final class DshUpdateManager: ObservableObject {
+final class HarnessUpdateManager: ObservableObject {
     enum UpdateState {
         case idle                            // 未检查或已是最新
         case checking                        // 检测中
@@ -557,16 +557,16 @@ final class DshUpdateManager: ObservableObject {
     @Published private(set) var localVersion: String?
 
     static let packageName = "@deepseek-ai/dsh"
-    static let shared = DshUpdateManager(processManager: DshProcessManager.shared)
+    static let shared = HarnessUpdateManager(processManager: HarnessProcessManager.shared)
     /// 自动复查间隔：24 小时
     private let recheckInterval: TimeInterval = 24 * 3600
     /// registry 检测超时
     private let requestTimeout: TimeInterval = 10
 
-    private let processManager: DshProcessManager
+    private let processManager: HarnessProcessManager
     private var didStartAutomaticChecks = false
 
-    init(processManager: DshProcessManager) {
+    init(processManager: HarnessProcessManager) {
         self.processManager = processManager
     }
 
@@ -643,7 +643,7 @@ final class DshUpdateManager: ObservableObject {
                     return
                 }
                 if let local = self.localVersion,
-                   DshProcessManager.compareVersion(remote, local) > 0 {
+                   HarnessProcessManager.compareVersion(remote, local) > 0 {
                     self.state = .available(remote: remote)
                     self.processManager.appendLog("发现新版本：本地 \(local) → 远程 \(remote)")
                 } else {
@@ -735,7 +735,7 @@ final class DshUpdateManager: ObservableObject {
 
 // MARK: - 鲸鱼图标（dsh 官方 favicon，反色版，作为菜单栏 template 图标）
 
-extension DshProcessManager {
+extension HarnessProcessManager {
     /// 从 app 资源加载官方鲸鱼 SVG，缩放到指定尺寸并设为 template，
     /// 由系统按菜单栏深浅色自动渲染（浅色栏黑鲸、深色栏白鲸）
     static func whaleTemplateImage(pointSize: CGFloat = 16) -> NSImage? {
@@ -757,13 +757,13 @@ extension DshProcessManager {
 
 #if !RUNTIME_LOCATOR_TEST
 @main
-struct DshWebBarApp: App {
+struct DeepSeekHarnessWebApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject private var manager = DshProcessManager.shared
-    @StateObject private var updater = DshUpdateManager.shared
+    @StateObject private var manager = HarnessProcessManager.shared
+    @StateObject private var updater = HarnessUpdateManager.shared
     @StateObject private var bootstrap = BootstrapCoordinator.shared
     /// 菜单栏鲸鱼图标（加载失败时回退 SF Symbol）
-    private let whaleBar = DshProcessManager.whaleTemplateImage()
+    private let whaleBar = HarnessProcessManager.whaleTemplateImage()
 
     var body: some Scene {
         MenuBarExtra {
@@ -807,13 +807,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         // 退出应用前优雅带走 dsh 服务，不留孤儿 node 进程
-        DshProcessManager.shared.shutdownSync()
+        HarnessProcessManager.shared.shutdownSync()
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
         // 环境未完成时重新显示向导；已就绪时只确保服务启动，不重复打开浏览器。
         if BootstrapCoordinator.shared.isReady {
-            DshProcessManager.shared.start()
+            HarnessProcessManager.shared.start()
         } else {
             BootstrapCoordinator.shared.showSetup()
         }
@@ -824,8 +824,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 // MARK: - 面板内容（macOS 26 原生 Liquid Glass + 系统菜单层级）
 
 struct MenuContent: View {
-    @EnvironmentObject var manager: DshProcessManager
-    @EnvironmentObject var updater: DshUpdateManager
+    @EnvironmentObject var manager: HarnessProcessManager
+    @EnvironmentObject var updater: HarnessUpdateManager
     @EnvironmentObject var bootstrap: BootstrapCoordinator
 
     var body: some View {
@@ -852,7 +852,7 @@ struct MenuContent: View {
                     }
 
                     MenuActionRow(
-                        title: "打开 DeepSeek Web 界面…",
+                        title: "打开 DeepSeek Harness Web 页面",
                         systemImage: "safari",
                         isEnabled: manager.state == .running
                     ) {
@@ -890,7 +890,7 @@ struct MenuContent: View {
             Divider().padding(.horizontal, 12)
 
             MenuActionRow(
-                title: "退出 DeepSeek Web",
+                title: "退出 DeepSeek Harness Web",
                 systemImage: "power",
                 tint: .secondary
             ) {
@@ -907,7 +907,7 @@ struct MenuContent: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 8) {
-                Text("DeepSeek Web")
+                Text("DeepSeek Harness Web")
                     .font(.title3.bold())
 
                 Spacer(minLength: 12)
@@ -1074,7 +1074,7 @@ final class SetupWindowController: NSObject, NSWindowDelegate {
                 backing: .buffered,
                 defer: false
             )
-            window.title = "DeepSeek Web 安装向导"
+            window.title = "DeepSeek Harness Web 安装向导"
             window.titleVisibility = .hidden
             window.titlebarAppearsTransparent = true
             window.isOpaque = false
@@ -1114,7 +1114,7 @@ struct SetupView: View {
                     .font(.system(size: 28))
                     .foregroundStyle(.tint)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("DeepSeek Web 安装向导")
+                    Text("DeepSeek Harness Web 安装向导")
                         .font(.title2.bold())
                     Text("启动器不会打包 DeepSeek Harness，所有安装均由您决定。")
                         .font(.subheadline)
@@ -1265,7 +1265,7 @@ struct SetupView: View {
                 .frame(height: 120)
             }
         case .ready:
-            Label("环境已就绪，正在启动 DeepSeek Web。", systemImage: "checkmark.circle.fill")
+            Label("环境已就绪，正在启动 DeepSeek Harness Web。", systemImage: "checkmark.circle.fill")
                 .font(.headline)
                 .foregroundStyle(.green)
         }

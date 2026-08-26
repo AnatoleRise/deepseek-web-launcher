@@ -1,6 +1,6 @@
-# DeepSeek Web
+# DeepSeek Harness Web Launcher
 
-一款面向 macOS 的第三方 DeepSeek Harness 菜单栏启动器。
+DeepSeek Harness Web 是一款面向 macOS 的第三方 DeepSeek Harness 菜单栏启动器。
 
 它将本地运行的 DeepSeek Harness Web 服务收纳到菜单栏中，提供环境检测、分步安装、服务启停、版本检查和日志查看等能力。界面使用 macOS 原生 SwiftUI 与 Liquid Glass，适合希望通过图形界面使用 `dsh web` 的用户。
 
@@ -15,8 +15,8 @@
     <th>应用图标</th>
   </tr>
   <tr>
-    <td><img src="./Docs/Images/menu-bar-panel.png" alt="DeepSeek Web 菜单栏面板" width="560"></td>
-    <td><img src="./Docs/Images/app-icon.png" alt="DeepSeek Web 应用图标" width="260"></td>
+    <td><img src="./Docs/Images/menu-bar-panel.png" alt="DeepSeek Harness Web 菜单栏面板" width="560"></td>
+    <td><img src="./Docs/Images/app-icon.png" alt="DeepSeek Harness Web 应用图标" width="260"></td>
   </tr>
 </table>
 
@@ -34,7 +34,7 @@
 
 ## 工作方式
 
-DeepSeek Web 负责检测并调用用户环境中已有的 Node.js、npm 和 DeepSeek Harness。
+DeepSeek Harness Web 负责检测并调用用户环境中已有的 Node.js、npm 和 DeepSeek Harness。
 
 应用启动后会依次执行以下检查：
 
@@ -64,7 +64,7 @@ npm install -g @deepseek-ai/dsh
 
 请前往 [GitHub Releases 最新版本页面](https://github.com/AnatoleRise/deepseek-harness-launcher/releases/latest) 下载适用于当前系统的安装包及 SHA-256 校验文件。
 
-打开 DMG，将 `DeepSeek Web.app` 拖入 `Applications` 文件夹。
+打开 DMG，将 `DeepSeek Harness Web.app` 拖入 `Applications` 文件夹。
 
 ### 免证书测试版
 
@@ -73,11 +73,11 @@ npm install -g @deepseek-ai/dsh
 确认无误后执行：
 
 ```bash
-xattr -dr com.apple.quarantine "/Applications/DeepSeek Web.app"
-open "/Applications/DeepSeek Web.app"
+xattr -dr com.apple.quarantine "/Applications/DeepSeek Harness Web.app"
+open "/Applications/DeepSeek Harness Web.app"
 ```
 
-该命令只移除 DeepSeek Web 的下载隔离标记，不会关闭系统 Gatekeeper。不要对来源不明的应用执行此操作。
+该命令只移除 DeepSeek Harness Web 的下载隔离标记，不会关闭系统 Gatekeeper。不要对来源不明的应用执行此操作。
 
 更完整的步骤请参阅[安装说明](./Docs/安装说明.txt)。
 
@@ -105,10 +105,10 @@ Node.js 与 npm 通过检测后，用户可以：
 ## 菜单栏操作
 
 - **启动服务 / 停止服务**：控制当前应用管理的 `dsh web` 子进程。
-- **打开 DeepSeek Web 界面**：在默认浏览器中访问本地 Web 服务。
+- **打开 DeepSeek Harness Web 页面**：在默认浏览器中访问本地 Web 服务。
 - **检查更新**：查询 npm registry 中的最新 dsh 版本。
-- **查看日志**：打开 `~/Library/Logs/dsh-web-bar.log`。
-- **退出 DeepSeek Web**：停止受管服务并退出菜单栏应用。
+- **查看日志**：打开 `~/Library/Logs/deepseek-harness-web.log`。
+- **退出 DeepSeek Harness Web**：停止受管服务并退出菜单栏应用。
 
 ## 从源码构建
 
@@ -129,8 +129,8 @@ chmod +x Scripts/build_dmg.sh
 构建脚本会先运行隔离环境检测测试，再生成：
 
 ```text
-dist/DeepSeek-Web-1.1.0-macOS26-arm64.dmg
-dist/DeepSeek-Web-1.1.0-macOS26-arm64.sha256
+dist/DeepSeek-Harness-Web-1.1.0-macOS26-arm64.dmg
+dist/DeepSeek-Harness-Web-1.1.0-macOS26-arm64.sha256
 ```
 
 脚本还会检查应用架构、最低系统版本、临时签名和发行包内容。
@@ -139,15 +139,15 @@ dist/DeepSeek-Web-1.1.0-macOS26-arm64.sha256
 
 ```text
 .
-├── Sources/DeepSeekWeb/     # 应用、环境检测、安装向导与菜单栏逻辑
-├── Tests/                   # 隔离环境检测测试
-├── Resources/               # 应用图标、菜单栏图标与图标集
-├── Config/                  # macOS 应用配置
-├── Scripts/                 # 构建与打包脚本
-├── Docs/                    # 面向最终用户的中文文档
-├── Tools/IconGeneration/    # 图标生成、预览与诊断工具
-├── README.md                # 项目说明
-└── LICENSE                  # MIT License
+├── Sources/DeepSeekHarnessWeb/  # 应用、环境检测、安装向导与菜单栏逻辑
+├── Tests/                       # 隔离环境检测测试
+├── Resources/                   # 应用图标、菜单栏图标与图标集
+├── Config/                      # macOS 应用配置
+├── Scripts/                     # 构建与打包脚本
+├── Docs/                        # 面向最终用户的中文文档
+├── Tools/IconGeneration/        # 图标生成、预览与诊断工具
+├── README.md                    # 项目说明
+└── LICENSE                      # MIT License
 ```
 
 ## 安全与隐私说明

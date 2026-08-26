@@ -2,25 +2,25 @@
 
 set -euo pipefail
 
-# DeepSeek Web 免证书 ARM64 测试版 DMG 构建脚本。
+# DeepSeek Harness Web 免证书 ARM64 测试版 DMG 构建脚本。
 # 只打包 Swift 启动器和视觉资源，严禁复制 Node、npm、dsh 或 node_modules。
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-SOURCE_DIR="$PROJECT_ROOT/Sources/DeepSeekWeb"
+SOURCE_DIR="$PROJECT_ROOT/Sources/DeepSeekHarnessWeb"
 TEST_DIR="$PROJECT_ROOT/Tests"
 RESOURCE_DIR="$PROJECT_ROOT/Resources"
 CONFIG_DIR="$PROJECT_ROOT/Config"
 DOCS_DIR="$PROJECT_ROOT/Docs"
-APP_NAME="DeepSeek Web"
+APP_NAME="DeepSeek Harness Web"
 VERSION="1.1.0"
 SDK_PATH="/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk"
-BUILD_ROOT="$(mktemp -d /private/tmp/dsh-web-dmg.XXXXXX)"
+BUILD_ROOT="$(mktemp -d /private/tmp/deepseek-harness-web-dmg.XXXXXX)"
 APP_PATH="$BUILD_ROOT/$APP_NAME.app"
 VOLUME_DIR="$BUILD_ROOT/volume"
 DIST_DIR="$PROJECT_ROOT/dist"
-DMG_PATH="$DIST_DIR/DeepSeek-Web-$VERSION-macOS26-arm64.dmg"
-SHA_PATH="$DIST_DIR/DeepSeek-Web-$VERSION-macOS26-arm64.sha256"
+DMG_PATH="$DIST_DIR/DeepSeek-Harness-Web-$VERSION-macOS26-arm64.dmg"
+SHA_PATH="$DIST_DIR/DeepSeek-Harness-Web-$VERSION-macOS26-arm64.sha256"
 
 cleanup() {
     rm -rf "${BUILD_ROOT:?}"
@@ -35,8 +35,8 @@ fi
 mkdir -p "$APP_PATH/Contents/MacOS" "$APP_PATH/Contents/Resources" "$VOLUME_DIR" "$DIST_DIR"
 
 # 先运行隔离环境检测测试；测试文件不会进入应用包或 DMG。
-CLANG_MODULE_CACHE_PATH=/private/tmp/dsh-clang-cache \
-SWIFT_MODULE_CACHE_PATH=/private/tmp/dsh-swift-cache \
+CLANG_MODULE_CACHE_PATH=/private/tmp/deepseek-harness-web-clang-cache \
+SWIFT_MODULE_CACHE_PATH=/private/tmp/deepseek-harness-web-swift-cache \
 xcrun swiftc \
     -O \
     -parse-as-library \
@@ -45,20 +45,20 @@ xcrun swiftc \
     -sdk "$SDK_PATH" \
     -target arm64-apple-macosx26.0 \
     -o "$BUILD_ROOT/runtime-locator-tests" \
-    "$SOURCE_DIR/DshWebBar.swift" \
+    "$SOURCE_DIR/DeepSeekHarnessWeb.swift" \
     "$TEST_DIR/RuntimeLocatorTests.swift"
 "$BUILD_ROOT/runtime-locator-tests"
 
-CLANG_MODULE_CACHE_PATH=/private/tmp/dsh-clang-cache \
-SWIFT_MODULE_CACHE_PATH=/private/tmp/dsh-swift-cache \
+CLANG_MODULE_CACHE_PATH=/private/tmp/deepseek-harness-web-clang-cache \
+SWIFT_MODULE_CACHE_PATH=/private/tmp/deepseek-harness-web-swift-cache \
 xcrun swiftc \
     -O \
     -parse-as-library \
     -swift-version 5 \
     -sdk "$SDK_PATH" \
     -target arm64-apple-macosx26.0 \
-    -o "$APP_PATH/Contents/MacOS/dsh-web-bar" \
-    "$SOURCE_DIR/DshWebBar.swift"
+    -o "$APP_PATH/Contents/MacOS/deepseek-harness-web" \
+    "$SOURCE_DIR/DeepSeekHarnessWeb.swift"
 
 cp "$CONFIG_DIR/Info.plist" "$APP_PATH/Contents/Info.plist"
 cp "$RESOURCE_DIR/AppIcon.icns" "$APP_PATH/Contents/Resources/AppIcon.icns"
@@ -68,7 +68,7 @@ codesign --force --deep --sign - "$APP_PATH"
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
 plutil -lint "$APP_PATH/Contents/Info.plist"
 
-if [[ "$(file "$APP_PATH/Contents/MacOS/dsh-web-bar")" != *"arm64"* ]]; then
+if [[ "$(file "$APP_PATH/Contents/MacOS/deepseek-harness-web")" != *"arm64"* ]]; then
     echo "错误：应用不是 ARM64 架构。" >&2
     exit 1
 fi

@@ -3,19 +3,19 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>DeepSeek Web</string>
+	<string>DeepSeek Harness Web</string>
 	<key>CFBundleDisplayName</key>
-	<string>DeepSeek Web</string>
+	<string>DeepSeek Harness Web</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.aicoding.dsh-web-bar</string>
+	<string>com.aicoding.deepseek-harness-web</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>3</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.1.0</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleExecutable</key>
-	<string>dsh-web-bar</string>
+	<string>deepseek-harness-web</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>LSMinimumSystemVersion</key>

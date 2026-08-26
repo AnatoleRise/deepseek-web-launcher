@@ -6,7 +6,7 @@ AGENTS.md
 CLAUDE.md
 
 # 本地编译与分发产物
-dsh-web-bar
+deepseek-harness-web
 dist/
 *.dmg
 *.sha256
