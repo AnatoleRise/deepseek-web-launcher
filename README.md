@@ -7,6 +7,19 @@
 > [!IMPORTANT]
 > 本项目是非官方第三方启动器，与 DeepSeek 官方没有隶属或授权关系。本项目不修改 DeepSeek Harness 的代码，仅围绕官方版本提供 macOS 菜单栏启动与管理能力。DeepSeek Harness 的代码、功能与许可证以其[官方仓库](https://github.com/deepseek-ai/deepseek-harness)为准。
 
+## 界面预览
+
+<table>
+  <tr>
+    <th>菜单栏面板</th>
+    <th>应用图标</th>
+  </tr>
+  <tr>
+    <td><img src="./Docs/Images/menu-bar-panel.png" alt="DeepSeek Web 菜单栏面板" width="560"></td>
+    <td><img src="./Docs/Images/app-icon.png" alt="DeepSeek Web 应用图标" width="260"></td>
+  </tr>
+</table>
+
 ## 主要功能
 
 - 常驻 macOS 菜单栏，不显示 Dock 图标。
